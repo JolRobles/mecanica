@@ -1,0 +1,52 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% load bootstrap5 %}
+<!--<body id="page-top"> -->
+
+<!-- Begin Page Content -->
+{% block content %}
+  {{ block.super }}
+  <div class="row text-center" style="display: flex; justify-content: center; align-items: center;">
+    <div class="col-md-4 menu"  style="background-color: #27A9E3;">
+        <a href="{% url 'usuarios:user_form' %}" style="color:#fff; text-decoration: none;">
+            <i class="fas fa-plus-circle" style="font-size: 100px; padding-top: 10px;"></i>
+            <h1>Marcas</h1>
+        </a>
+    </div>
+    <div class="col-md-4 menu" style="background-color: #28B779;">
+        <a href="{% url 'ordenes:orden_list' %}" style="color:#fff; text-decoration: none;">
+            <i class="fas fa-list-alt" style="font-size: 100px;"></i>
+            <h1>Modelos</h1>
+        </a>
+    </div>
+    <div class="col-md-4 menu" style="background-color: #FFB848;">
+        <a href="{% url 'ordenes:orden_list' %}" style="color:#fff; text-decoration: none;">
+            <i class="fas fa-boxes" style="font-size: 100px; padding-top: 10px ;"></i>
+            <h1>Empresa</h1>
+        </a>
+    </div>
+    <div class="col-md-4 menu" style="background-color: #DA542E;">
+        <a href="{% url 'ordenes:orden_list' %}" style="color:#fff; text-decoration: none;">
+            <i class="fas fa-users" style="font-size: 100px;"></i>
+            <h1>Tipos Vehículo</h1>
+        </a>
+    </div>
+    <div class="col-md-4 menu" style="background-color: #2255A4 ;">
+        <a href="{% url 'ordenes:orden_list' %}" style="color:#fff; text-decoration: none;">
+            <i class="fas fa-user-cog" style="font-size: 100px; padding-top: 10px;"></i>
+            <h1>Colores</h1>
+        </a>
+    </div>
+    <div class="col-md-4 menu" style="background-color: #27A9E3;">
+        <a href="{% url 'ordenes:orden_list' %}" style="color:#fff; text-decoration: none;">
+            <i class="fas fa-cog" style="font-size: 100px; padding-top: 10px;"></i>
+            <h1>Servicio técnico</h1>
+        </a>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,53 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% load bootstrap5 %}
+<!--<body id="page-top"> -->
+
+<!-- Begin Page Content -->
+{% block content %}
+  {{ block.super }}
+  <div class="container">
+    <div class="text-center" style="padding-bottom: 20px;">
+        <a type="button" href="{% url 'usuarios:user_form' %}" class="btn btn-success"><span class="fa fa-plus-circle"></span> Crear Usuario</a>
+    </div>
+  <div class="row table-responsive" style="display: flex; justify-content: center; align-items: center;">
+    <table id="example" class="table table-striped table-responsive" style="width:100%">
+        <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Rol</th>
+                <th>Correo</th>
+                <th>Telefono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+                <td>{{usuario.cedula}}</td>
+                <td>{{usuario.user.first_name}}</td>
+                <td>{{usuario.user.last_name}}</td>
+                {% for group in usuario.user.groups.all %}
+                <td>{{group.name}}</td>
+                {% endfor %}
+                <td>{{usuario.user.email}}</td>
+                <td>{{usuario.telefono}}</td>
+                <td>
+                    <a href="{% url 'usuarios:user_edit' usuario.pk %}" class="btn btn-warning"  title="Editar"><span class="fa fa-edit"></span></a>
+                    <a href="{% url 'usuarios:user_delete' usuario.pk %}" class="btn btn-danger"  title="Eliminar"><span class="fa fa-trash"></span></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+
+{% endblock content %}

@@ -1,0 +1,50 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% load bootstrap5 %}
+<!--<body id="page-top"> -->
+
+<!-- Begin Page Content -->
+{% block content %}
+  {{ block.super }}
+  <div class="container">
+    <div class="text-center" style="padding-bottom: 20px;">
+        <a type="button" href="{% url 'usuarios:cliente_form' %}" class="btn btn-success"><span class="fa fa-plus-circle"></span> Crear Clientes</a>
+        <a type="button" href="{% url 'usuarios:importar_clientes' %}" class="btn btn-primary"><span class="fa fa-list"></span> Importar Clientes</a>
+    </div>
+  <div class="row table-responsive" style="display: flex; justify-content: center; align-items: center;">
+    <table id="example" class="table table-striped table-responsive" style="width:100%">
+        <thead>
+            <tr>
+                <th>Cédula</th>
+                <th>Nombres y Apellidos</th>
+                <th>Telefono</th>
+                <th>Dirección</th>
+                <th>Referencia</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{cliente.cedula}}</td>
+                <td>{{cliente.nombre_apellido}}</td>
+                <td>{{cliente.telefono}}</td>
+                <td>{{cliente.direccion}}</td>
+                <td>{{cliente.referencia}}</td>
+                <td>
+                    <a href="{% url 'usuarios:cliente_edit' cliente.pk %}" class="btn btn-warning"  title="Editar"><span class="fa fa-edit"></span></a>
+                    <a href="{% url 'usuarios:cliente_delete' cliente.pk %}" class="btn btn-danger"  title="Eliminar"><span class="fa fa-trash"></span></a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+
+{% endblock content %}

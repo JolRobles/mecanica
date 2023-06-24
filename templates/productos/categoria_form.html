@@ -1,0 +1,30 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% load bootstrap5 %}
+<!--<body id="page-top"> -->
+
+<!-- Begin Page Content -->
+{% block content %}
+  {{ block.super }}
+  <div class="row text-center col-md-12" style="display: flex; justify-content: center; align-items: center;">
+    <h1><strong>{{title}}</strong></h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="panel-body">
+        {% bootstrap_form categoria_form layout='horizontal' %}
+      </div>
+      <div class="panel-footer text-right" style="padding-bottom: 20px;">
+        <a type="button" href="{% url 'productos:categorias_list' %}" class="btn btn-primary" type="submit">Volver</a>
+        <button type="submit" class="btn btn-success" id="btn-guardar-usuario">
+            Guardar
+        </button>
+      </div>
+    </form>
+</div>
+
+{% endblock content %}
