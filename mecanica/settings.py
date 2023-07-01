@@ -88,8 +88,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'mecanica_db',
-        'USER': 'postgres',
-        'PASSWORD': 'root', #Yorch
+        # 'USER': 'postgres',
+        'USER': 'jolrobles',
+        'PASSWORD': 'Ad123456.', #Yorch
+        # 'PASSWORD': 'root', #Yorch
         'HOST': 'localhost',
         'PORT': 5432,
     }
