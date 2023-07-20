@@ -2,18 +2,21 @@
 <header id="id_header" class="navbar">
     <div class="row" style="margin: 0px;">
 
-        <div id="id_logo" class="col-md-6">
+        <div id="id_logo" class="col-md-4">
             <a class="navbar-brand text-left" href="{% url 'home:index' %}">
-                <img  src="{% static 'img/mechanicallogo.png' %}" alt="Mechanical Control" height="75%" width="25%"  style="padding-left: 30px;">
+                <img  src="{% static 'img/mechanicallogo.png' %}" alt="Mechanical Control" height="100%" width="30%"  style="padding-left: 30px;">
             </a>
         </div>
-        <div class="col-md-6 text-right" style="text-align: end;">
+        <div id="id_empresa" class="col-md-4">
+            <h1>Mecanica el chulla</h1>
+        </div>
+        <div class="col-md-4 text-right" style="text-align: end;">
         <a href="{% url 'home:index' %}" style="color:#fff; padding-right: 20px; text-decoration: none;" title="Home">
             <i class="fas fa-home" style="font-size: 50px;"></i>
         </a>
-        <a href="{% url 'usuarios:user_form' %}" style="color:#fff; padding-right: 20px; text-decoration: none;" title="Perfil">
+        <!-- <a href="{% url 'usuarios:user_form' %}" style="color:#fff; padding-right: 20px; text-decoration: none;" title="Perfil">
             <i class="fas fa-user" style="font-size: 50px;"></i>
-        </a>
+        </a> -->
         <a href="{% url 'home:logout_view' %}" style="color:#fff; padding-right: 20px; text-decoration: none;" title="Cerrar sesión">
             <i class="fas fa-sign-out-alt" style="font-size: 50px;"></i>
         </a>

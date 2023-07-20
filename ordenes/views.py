@@ -97,7 +97,7 @@ def orden_edit(request, orden_pk):
                     producto.delete()
 
             for i in range(len(pk_productos)):
-                if ProductoOrden.objects.filter(producto__pk=int(pk_productos[i])).exists():
+                if ProductoOrden.objects.filter(producto__pk=int(pk_productos[i]), orden=orden).exists():
                     ProductoOrden.objects.filter(producto__pk=int(pk_productos[i])).update(
                         detalle=detalle_productos[i],
                         cantidad=float(cantidad_productos[i]),
