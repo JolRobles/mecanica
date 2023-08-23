@@ -11,7 +11,7 @@ class Tipo(models.Model):
     def __str__(self):
         return self.nombre
     
-class Marca(models.Model):
+class MarcaVehiculo(models.Model):
     nombre = models.CharField(blank=True, max_length=500, null=True)
     class Meta:
         verbose_name = 'Marca'
@@ -21,7 +21,7 @@ class Marca(models.Model):
     
 class Vehiculo(models.Model):
     tipo = models.ForeignKey(Tipo, on_delete=models.CASCADE, null=True, blank=True)
-    marca = models.ForeignKey(Marca, on_delete=models.CASCADE, null=True, blank=True)
+    marca = models.ForeignKey(MarcaVehiculo, on_delete=models.CASCADE, null=True, blank=True)
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, null=True, blank=True)
     modelo = models.CharField(blank=True, max_length=500, null=True)
     placa = models.CharField(blank=True, max_length=15, null=True)

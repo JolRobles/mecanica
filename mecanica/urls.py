@@ -26,6 +26,7 @@ urlpatterns = [
     path(r'ordenes/', include(('ordenes.urls', 'ordenes'),namespace ='ordenes')),
     path(r'usuarios/', include(('usuarios.urls', 'usuarios'),namespace ='usuarios')),
     path(r'productos/', include(('productos.urls', 'productos'),namespace ='productos')),
+    path(r'vehiculos/', include(('vehiculos.urls', 'vehiculos'),namespace ='vehiculos')),
 ]
 
 handler404 = error_404_view
