@@ -1,0 +1,27 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% load bootstrap5 %}
+<!--<body id="page-top"> -->
+
+<!-- Begin Page Content -->
+{% block content %}
+  {{ block.super }}
+  <div class="row text-center col-md-12" style="display: flex; justify-content: center; align-items: center;">
+    <h1><strong>{{title}}</strong></h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+        <h5>Esta seguro de que quiere eliminar a "{{object_delete}}"</h5>
+        <a type="button" href="{% url 'productos:marcas_list' %}"class="btn btn-primary" type="submit">Volver</a>
+        <button type="submit" class="btn btn-danger" id="btn-guardar-usuario">
+            Eliminar
+        </button>
+      </div>
+    </form>
+</div>
+
+{% endblock content %}

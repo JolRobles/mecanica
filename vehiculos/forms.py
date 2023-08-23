@@ -17,3 +17,12 @@ class VehiculoForm(forms.ModelForm):
             'placa': forms.TextInput(attrs={'onkeyup': 'convertirMayusculas(this)'}),
         }
 
+class MarcaVehiculoForm(forms.ModelForm):
+    """Form definition for MarcaVehiculoForm."""
+
+    class Meta:
+        """Meta definition for MarcaVehiculoForm."""
+
+        model = MarcaVehiculo
+        fields = '__all__'
+        

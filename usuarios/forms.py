@@ -58,6 +58,5 @@ class ClienteForm(forms.ModelForm):
         }
         widgets = {
             'nombre_apellido': forms.TextInput(attrs={'required':'true', 'onkeyup':'buscarCliente(this, 2)', 'autocomplete':'off', 'list':'usuario_by_nombre'}),
-            'cedula':forms.TextInput(attrs={'required':'true', 'onkeyup':'buscarCliente(this, 1)', 'autocomplete':'off', 'list':'usuario_by_cedula'}),
-            'telefono':forms.TextInput(attrs={'required':'true'})
+            'cedula':forms.TextInput(attrs={'onkeyup':'buscarCliente(this, 1)', 'autocomplete':'off', 'list':'usuario_by_cedula'}),
         }

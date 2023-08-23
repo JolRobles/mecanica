@@ -12,6 +12,6 @@ class VehiculoAdmin(admin.ModelAdmin):
 class TipoAdmin(admin.ModelAdmin):
     list_display=['id','nombre']
 
-@admin.register(Marca)
-class MarcaAdmin(admin.ModelAdmin):
+@admin.register(MarcaVehiculo)
+class MarcaVehiculoAdmin(admin.ModelAdmin):
     list_display=['id','nombre']
