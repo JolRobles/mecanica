@@ -11,8 +11,8 @@ from usuarios.views import *
 
 def orden_list(request):
     empresa = get_empresa(request)
-    ordenes = Orden.objects.filter(empresa=empresa).order_by('-pk')
-    context = {
+    ordenes = Orden.objects.filter(empresa=empresa)
+    context = { 
         'ordenes':ordenes
     }
     return render(request, "ordenes/ordenes_list.html", context)
@@ -29,6 +29,14 @@ def orden_form(request):
         cliente_form = ClienteForm(request.POST)
         vehiculo_form = VehiculoForm(request.POST)
         orden_form = OrdenForm(request.POST)
+        tipo = request.POST.getlist('tipo')
+        marca = request.POST.getlist('marca')
+        modelo = request.POST.getlist('modelo')
+        placa = request.POST.getlist('placa')
+        password = request.POST.getlist('password')
+        mecanico = request.POST.getlist('mecanico')
+        situacion = request.POST.getlist('situacion')
+        observacion = request.POST.getlist('observacion')
         if cliente_form.is_valid() and vehiculo_form.is_valid() and orden_form.is_valid():
             if Cliente.objects.filter(cedula=cliente_form.cleaned_data['cedula']).exists():
                 cliente = Cliente.objects.get(cedula=cliente_form.cleaned_data['cedula'])
@@ -36,18 +44,31 @@ def orden_form(request):
                     cliente = cliente_form.save()
             else:
                 cliente = cliente_form.save()
-            vehiculo = vehiculo_form.save()
-            orden = orden_form.save(commit=False)
-            orden.empresa = empresa 
-            orden.cliente = cliente 
-            orden.vehiculo = vehiculo
-            orden.save()
-            estado_orden = EstadOrden.objects.create(
-                estado=orden.estado,
-                orden=orden,
-                usuario=usuario
-            )
-            estado_orden.save()
+            for i in range(len(tipo)):
+                vehiculo = Vehiculo.objects.create(
+                    tipo_id = tipo[i],
+                    marca_id = marca[i],
+                    empresa = empresa,
+                    modelo = modelo[i],
+                    placa = placa[i],
+                    password = password[i],
+                )
+                vehiculo.save()
+                orden = Orden.objects.create(
+                    cliente = cliente,
+                    vehiculo = vehiculo,
+                    empresa = empresa,
+                    situacion = situacion[i],
+                    observacion = observacion[i],
+                    mecanico_id = mecanico[i],
+                )
+                orden.save()
+                estado_orden = EstadOrden.objects.create(
+                    estado=orden.estado,
+                    orden=orden,
+                    usuario=usuario
+                )
+                estado_orden.save()
             return redirect('ordenes:orden_list')
         else:
             print(cliente_form.errors)

@@ -40,7 +40,8 @@ Dashboard
           </div>
 
         </div>
-        <div class="row text-center" style="display: flex; justify-content: center; align-items: center;">
+        <a type="button" class="btn btn-info" onclick="duplicarVehiculo()">Agregar Vehículo</a>
+        <div id="div_vehiculo" class="row text-center" style="display: flex; justify-content: center; align-items: center;">
           <h5>Datos Vehículo</h5>
           <div class="col-md-4 col-xs-12">
             {% bootstrap_field vehiculo_form.tipo layout='horizontal' %}
@@ -83,4 +84,30 @@ Dashboard
 <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
 <script type="text/javascript" src="{% static 'js/orden.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/usuario.js' %}"></script>
+
+<script>
+  function duplicarVehiculo() {
+  // Obtén una referencia al div original
+  let divOriginal = document.getElementById('div_vehiculo');
+
+  // Crea una copia del div original
+  let divClonado = divOriginal.cloneNode(true);
+
+  // Cambia el id del div clonado (si es necesario)
+  divClonado.id = 'divClonado'; // Cambia a un id único si es necesario
+
+  let inputsClonados = divClonado.querySelectorAll('input');
+  inputsClonados.forEach(function(input) {
+    input.value = ''; // Establece el valor del input a vacío
+  });
+  divClonado.id = 'divClonado'; // Cambia a un id único si es necesario
+  
+  let textareaClonados = divClonado.querySelectorAll('textarea');
+  textareaClonados.forEach(function(input) {
+    input.value = ''; // Establece el valor del input a vacío
+  });
+  // Inserta el div clonado antes del div original
+  divOriginal.parentNode.insertBefore(divClonado, divOriginal);
+}
+</script>
 {% endblock content %}
