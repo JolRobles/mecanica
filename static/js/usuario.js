@@ -50,7 +50,12 @@ function fillFields(element, dataList, field) {
       if (options[i].value === val) {
         // An item was selected from the list!
         // yourCallbackHere()
+        console.log("-***********");
+        console.log(val);
+        console.log(options[i].value);
+
         let client = getClientCi(val)[0]
+        console.log(client);
         //send data to inputs
         $('#id_tipo_identificacion').val(client.tipo_identificacion).change()
         $('#id_cedula').val(client.cedula)
@@ -73,7 +78,11 @@ function getClientCi(cedula) {
 espacioCodigo = cedula.search(' ')
 return data_client.filter(
     function(data_client) {
-    return data_client.cedula == cedula.slice(0, espacioCodigo)
+      if (!data_client.cedula){
+        return data_client
+      }else{
+        return data_client.cedula == cedula.slice(0, espacioCodigo)
+      }
     }
 );
 }
