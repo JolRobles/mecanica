@@ -11,7 +11,7 @@ from usuarios.views import *
 
 def orden_list(request):
     empresa = get_empresa(request)
-    ordenes = Orden.objects.filter(empresa=empresa)
+    ordenes = Orden.objects.filter(empresa=empresa).order_by('-pk')
     context = {
         'ordenes':ordenes
     }
@@ -32,6 +32,8 @@ def orden_form(request):
         if cliente_form.is_valid() and vehiculo_form.is_valid() and orden_form.is_valid():
             if Cliente.objects.filter(cedula=cliente_form.cleaned_data['cedula']).exists():
                 cliente = Cliente.objects.get(cedula=cliente_form.cleaned_data['cedula'])
+                if cliente.nombre_apellido != cliente_form.cleaned_data['nombre_apellido']:
+                    cliente = cliente_form.save()
             else:
                 cliente = cliente_form.save()
             vehiculo = vehiculo_form.save()
@@ -57,6 +59,7 @@ def orden_form(request):
                 'vehiculo_form':vehiculo_form,
                 'orden_form':orden_form,
             }
+            print("**************************")
             return render(request, "ordenes/orden_form.html", context)
 
     context = {
