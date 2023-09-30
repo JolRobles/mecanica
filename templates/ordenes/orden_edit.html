@@ -62,14 +62,14 @@ Editar Orden
                 <input id="id_producto_pk" class="form-control" name="pk_producto"  type="text" placeholder="pk_producto" value="{{producto.producto.pk}}">
               </div>
               <div class="col-md-4">
-                <input id="id_producto" class="form-control"  type="text" name="detalle_producto" value="{{producto.detalle}}" list="producto_by_nombre" placeholder="Producto" onkeyup="buscarProducto(this)">
+                <input id="id_producto" autocomplete="off" class="form-control"  type="text" name="detalle_producto" value="{{producto.detalle}}" list="producto_by_nombre" placeholder="Nombre del producto" onkeyup="buscarProducto(this)">
                 <datalist id="producto_by_nombre"></datalist>
               </div>
               <div class="col-md-3">
-                <input id="id_cantidad" class="form-control" type="number" name="cantidad_producto" placeholder="Cantidad" value="{{producto.cantidad}}">
+                <input id="id_cantidad" autocomplete="off" class="form-control" type="number" name="cantidad_producto" placeholder="Cantidad" value="{{producto.cantidad}}">
               </div>
               <div class="col-md-3">
-                <input id="id_precio" class="form-control" type="number" name="precio_producto"  placeholder="Precio" onKeyUp=calcularCosto() value="{{producto.pvp}}">
+                <input id="id_precio" autocomplete="off" class="form-control" type="number" name="precio_producto"  placeholder="Precio" onKeyUp=calcularCosto() value="{{producto.pvp}}">
               </div>
             </div>
             {% endfor %}

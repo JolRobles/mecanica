@@ -15,10 +15,11 @@ Dashboard
     <div class="text-center" style="padding-bottom: 20px;">
         <a type="button" href="{% url 'ordenes:orden_form' %}" class="btn btn-success"><span class="fa fa-plus-circle"></span> Crear Orden</a>
     </div>
-  <div class="row  table-responsive" style="display: flex; justify-content: center; align-items: center;">
+  <div class="row table-responsive" style="display: flex; justify-content: center; align-items: center;">
     <table id="example" class="table table-striped table-responsive" style="width:100%">
         <thead>
             <tr>
+                <th id="sorting sorting_desc">pk</th>
                 <th>Nombres y Apellidos</th>
                 <th>Marca</th>
                 <th>Vehículo</th>
@@ -31,6 +32,7 @@ Dashboard
         <tbody>
             {% for orden in ordenes %}
             <tr>
+                <td>{{orden.pk}}</td>
                 <td>{{orden.cliente}}</td>
                 <td>{{orden.vehiculo.marca}}</td>
                 <td>{{orden.vehiculo}}</td>
