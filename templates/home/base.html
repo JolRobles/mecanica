@@ -82,14 +82,15 @@ body {
     <p class="text-center">©2023 | Este sitio fue desarrollado por JYSYS | 0981538762</p>
   </footer>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-  <script>
-      $(document).ready(function () {
-      $('#example').DataTable();
-      });
-  </script>
   <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+  <script>
+      $(document).ready(function () {
+        if ($('#example').length) $('#example').DataTable();
+        {% block datatable_options %}{% endblock %}
+      });
+  </script>
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">

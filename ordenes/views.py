@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.http import HttpResponse
 from django.db import transaction
+from django.db.models import Max, F
 from django.contrib.auth.decorators import login_required
 from .forms import *
 from usuarios.forms import *
@@ -11,9 +12,11 @@ from usuarios.views import *
 
 def orden_list(request):
     empresa = get_empresa(request)
-    ordenes = Orden.objects.filter(empresa=empresa)
-    context = { 
-        'ordenes':ordenes
+    ordenes = Orden.objects.filter(empresa=empresa).select_related(
+        'cliente', 'vehiculo', 'vehiculo__marca', 'vehiculo__tipo', 'estado'
+    ).order_by('-fecha_ingreso', '-pk')
+    context = {
+        'ordenes': ordenes
     }
     return render(request, "ordenes/ordenes_list.html", context)
 
@@ -38,10 +41,24 @@ def orden_form(request):
         situacion = request.POST.getlist('situacion')
         observacion = request.POST.getlist('observacion')
         if cliente_form.is_valid() and vehiculo_form.is_valid() and orden_form.is_valid():
-            if Cliente.objects.filter(cedula=cliente_form.cleaned_data['cedula']).exists():
-                cliente = Cliente.objects.get(cedula=cliente_form.cleaned_data['cedula'])
-                if cliente.nombre_apellido != cliente_form.cleaned_data['nombre_apellido']:
-                    cliente = cliente_form.save()
+            cedula = cliente_form.cleaned_data.get('cedula')
+            if cedula and Cliente.objects.filter(cedula=cedula).exists():
+                # Si hay duplicados: usar el cliente que tenga la orden más reciente (unifica historial)
+                cliente = (
+                    Cliente.objects.filter(cedula=cedula)
+                    .annotate(ultima_orden_fecha=Max('orden__fecha_ingreso'))
+                    .order_by(F('ultima_orden_fecha').desc(nulls_last=True))
+                    .first()
+                )
+                if (cliente.nombre_apellido != cliente_form.cleaned_data.get('nombre_apellido') or
+                        cliente.telefono != cliente_form.cleaned_data.get('telefono') or
+                        cliente.direccion != cliente_form.cleaned_data.get('direccion') or
+                        cliente.referencia != cliente_form.cleaned_data.get('referencia') or
+                        cliente.tipo_identificacion != cliente_form.cleaned_data.get('tipo_identificacion')):
+                    # Actualizar el cliente existente pasando instance (no crear uno nuevo)
+                    form_actualizado = ClienteForm(request.POST, instance=cliente)
+                    if form_actualizado.is_valid():
+                        cliente = form_actualizado.save()
             else:
                 cliente = cliente_form.save()
             for i in range(len(tipo)):
@@ -139,7 +156,6 @@ def orden_edit(request, orden_pk):
                     producto_orden.save()
             return redirect('ordenes:orden_list')
         else:
-            print(cliente_form.errors)
             print(vehiculo_form.errors)
             print(orden_form.errors)
             context = {

@@ -16,11 +16,12 @@ Dashboard
         <a type="button" href="{% url 'ordenes:orden_form' %}" class="btn btn-success"><span class="fa fa-plus-circle"></span> Crear Orden</a>
     </div>
   <div class="row table-responsive" style="display: flex; justify-content: center; align-items: center;">
-    <table id="example" class="table table-striped table-responsive" style="width:100%">
+    <table id="tabla-ordenes" class="table table-striped table-responsive" style="width:100%">
         <thead>
             <tr>
                 <th id="sorting sorting_desc">pk</th>
                 <th>Nombres y Apellidos</th>
+                <th>Cédula</th>
                 <th>Marca</th>
                 <th>Vehículo</th>
                 <th>Placa</th>
@@ -34,6 +35,7 @@ Dashboard
             <tr>
                 <td>{{orden.pk}}</td>
                 <td>{{orden.cliente}}</td>
+                <td>{{orden.cliente.cedula}}</td>
                 <td>{{orden.vehiculo.marca}}</td>
                 <td>{{orden.vehiculo}}</td>
                 <td>{{orden.vehiculo.placa}}</td>
@@ -51,5 +53,21 @@ Dashboard
     </table>
 </div>
 </div>
-
 {% endblock content %}
+
+{% block datatable_options %}
+if ($('#tabla-ordenes').length) {
+  $('#tabla-ordenes').DataTable({
+    order: [[7, 'desc']],
+    language: {
+      search: 'Buscar:',
+      lengthMenu: 'Mostrar _MENU_ registros',
+      info: '_START_ a _END_ de _TOTAL_',
+      paginate: { first: 'Primero', last: 'Último', next: 'Siguiente', previous: 'Anterior' }
+    },
+    columnDefs: [
+      { orderable: false, searchable: false, targets: 8 }
+    ]
+  });
+}
+{% endblock %}
