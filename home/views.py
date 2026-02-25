@@ -19,16 +19,19 @@ def configuracion(request):
     return render(request, "home/configuracion.html")
 
 def login(request):
+    error = None
+    username_value = ''
     if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        username_value = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username_value, password=password)
         if user is not None:
             do_login(request, user)
             return redirect('home:index')
-   
-    return render(request, "home/login.html")
+        error = "Usuario o contraseña incorrectos. Intente de nuevo."
+
+    return render(request, "home/login.html", {'error': error, 'username_value': username_value})
 
 def logout_view(request):
     logout(request)

@@ -184,10 +184,11 @@ def orden_edit(request, orden_pk):
 
 
 def historial(request, pk):
-    orden = Orden.objects.get(pk=pk)
-    historiales = EstadOrden.objects.filter(orden=orden)
+    orden = Orden.objects.select_related('cliente', 'vehiculo', 'estado').get(pk=pk)
+    historiales = EstadOrden.objects.filter(orden=orden).select_related('estado', 'usuario').order_by('-fecha_ingreso')
 
     context = {
-        'historiales':historiales,
+        'orden': orden,
+        'historiales': historiales,
     }
     return render(request, "ordenes/historial.html", context)
