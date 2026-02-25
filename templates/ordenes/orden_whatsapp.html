@@ -1,0 +1,49 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}
+Enviar aviso por WhatsApp - Orden {{ orden.pk }}
+{% endblock title %}
+
+{% load bootstrap5 %}
+
+{% block content %}
+{{ block.super }}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-header py-3 bg-success text-white">
+          <h5 class="card-title mb-0"><i class="fab fa-whatsapp me-2"></i>Orden finalizada</h5>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">La orden <strong>#{{ orden.pk }}</strong> se guardó correctamente. Puede enviar un aviso al cliente por WhatsApp (se abrirá WhatsApp Web en una nueva pestaña).</p>
+
+          {% if whatsapp_url %}
+            <p class="small text-muted mb-2">Cliente: {{ orden.cliente|default:"—" }} · Teléfono: {{ telefono|default:"No registrado" }}</p>
+            <div class="mb-3">
+              <label class="form-label small text-muted">Vista previa del mensaje:</label>
+              <pre class="bg-light p-3 rounded small mb-0" style="white-space: pre-wrap; font-size: 0.85rem;">{{ mensaje }}</pre>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-success" id="btn-whatsapp">
+                <i class="fab fa-whatsapp me-2"></i> Abrir WhatsApp Web
+              </a>
+              <a href="{% url 'ordenes:orden_list' %}" class="btn btn-outline-secondary">Ir al listado de órdenes</a>
+            </div>
+          {% else %}
+            <div class="alert alert-warning mb-0">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              No hay número de teléfono registrado para el cliente. Agregue el teléfono del cliente para poder enviar el aviso por WhatsApp.
+            </div>
+            <div class="mt-3">
+              <a href="{% url 'ordenes:orden_edit' orden.pk %}" class="btn btn-outline-primary me-2">Editar orden</a>
+              <a href="{% url 'ordenes:orden_list' %}" class="btn btn-outline-secondary">Ir al listado</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}

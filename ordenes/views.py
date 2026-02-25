@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 # Create your views here.
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.db import transaction
 from django.db.models import Max, F
 from django.contrib.auth.decorators import login_required
+from urllib.parse import quote
 from .forms import *
 from usuarios.forms import *
 from vehiculos.forms import *
@@ -15,8 +17,15 @@ def orden_list(request):
     ordenes = Orden.objects.filter(empresa=empresa).select_related(
         'cliente', 'vehiculo', 'vehiculo__marca', 'vehiculo__tipo', 'estado'
     ).order_by('-fecha_ingreso', '-pk')
+    abrir_whatsapp_url = None
+    pk_wa = request.GET.get('abrir_whatsapp')
+    if pk_wa and pk_wa.isdigit():
+        orden_wa = Orden.objects.filter(pk=int(pk_wa), empresa=empresa).first()
+        if orden_wa:
+            abrir_whatsapp_url = _whatsapp_url_para_orden(orden_wa)
     context = {
-        'ordenes': ordenes
+        'ordenes': ordenes,
+        'abrir_whatsapp_url': abrir_whatsapp_url,
     }
     return render(request, "ordenes/ordenes_list.html", context)
 
@@ -116,7 +125,16 @@ def orden_edit(request, orden_pk):
     orden_object = Orden.objects.get(pk=orden_pk)
     vehiculo_form = VehiculoForm(instance=orden_object.vehiculo)
     orden_form = OrdenEditForm(instance=orden_object)
-    detalles_orden = DetalleOrden.objects.filter(orden=orden_object)
+    detalles_qs = DetalleOrden.objects.filter(orden=orden_object)
+    # Formato con punto decimal para inputs type="number" (evitar coma de locale)
+    detalles_orden = [
+        {
+            'detalle': d,
+            'cantidad_display': '{0:.2f}'.format(float(d.cantidad or 0)),
+            'pvp_display': '{0:.2f}'.format(float(d.pvp or 0)),
+        }
+        for d in detalles_qs
+    ]
     if request.method == "POST":
         vehiculo_form = VehiculoForm(request.POST, instance=orden_object.vehiculo)
         orden_form = OrdenEditForm(request.POST, instance=orden_object)
@@ -135,7 +153,7 @@ def orden_edit(request, orden_pk):
             )
             estado_orden.save()
             # Eliminar detalles que ya no vienen en el formulario
-            for detalle in detalles_orden:
+            for detalle in detalles_qs:
                 if str(detalle.pk) not in pk_detalles:
                     detalle.delete()
             # Crear o actualizar detalles (texto libre, sin inventario)
@@ -163,6 +181,14 @@ def orden_edit(request, orden_pk):
                     pvp=pvp,
                     tipo_producto=tipo,
                 )
+            # Si el estado es Finalizado, ir al listado y abrir WhatsApp automáticamente
+            estado_finalizado = (
+                orden.estado_id == 5
+                or (orden.estado and 'finalizado' in (orden.estado.nombre or '').lower())
+            )
+            if estado_finalizado:
+                path_listado = reverse('ordenes:orden_list')
+                return HttpResponseRedirect(path_listado + '?abrir_whatsapp=' + str(orden.pk))
             return redirect('ordenes:orden_list')
         else:
             print(vehiculo_form.errors)
@@ -181,6 +207,117 @@ def orden_edit(request, orden_pk):
         'detalles_orden': detalles_orden,
     }
     return render(request, "ordenes/orden_edit.html", context)
+
+
+def _normalizar_telefono_wa(telefono):
+    """Deja el teléfono solo dígitos y añade código país 593 (Ecuador) si hace falta."""
+    if not telefono:
+        return ''
+    dig = ''.join(c for c in str(telefono) if c.isdigit())
+    if len(dig) == 9:
+        return '593' + dig
+    if len(dig) == 10 and dig.startswith('0'):
+        return '593' + dig[1:]
+    if len(dig) >= 12 and dig.startswith('593'):
+        return dig
+    return dig
+
+
+def _whatsapp_url_para_orden(orden):
+    """Construye la URL de wa.me con el mensaje para la orden, o None si no hay teléfono."""
+    orden = Orden.objects.select_related('cliente', 'vehiculo', 'vehiculo__marca').filter(pk=orden.pk).first()
+    if not orden:
+        return None
+    detalles = DetalleOrden.objects.filter(orden=orden)
+    vehiculo_texto = ""
+    if orden.vehiculo:
+        marca_obj = getattr(orden.vehiculo, 'marca', None)
+        marca = getattr(marca_obj, 'nombre', None) if marca_obj else ''
+        modelo = getattr(orden.vehiculo, 'modelo', '') or ''
+        vehiculo_texto = f"{marca} - {modelo}".strip(' -') if (marca or modelo) else str(orden.vehiculo)
+    nombre_cliente = (orden.cliente.nombre_apellido if orden.cliente else '').strip() or 'cliente'
+    lineas = [
+        f"Hola {nombre_cliente}!",
+        "",
+        "*Servicio Automotriz Chulla*",
+        "",
+        "Le informamos que su vehículo está *listo para retirar*.",
+        f"Orden #{orden.pk}" + (f" - {vehiculo_texto}" if vehiculo_texto else ""),
+        "",
+        "*Resumen de la reparación:*",
+    ]
+    for d in detalles:
+        if d.producto:
+            subtotal = float(d.cantidad or 0) * float(d.pvp or 0)
+            lineas.append(f"  - {d.producto}: {d.cantidad} x ${d.pvp} = ${subtotal:.2f}")
+    total = float(orden.monto_cobrar or 0)
+    lineas.append("")
+    lineas.append(f"*Total: ${total:.2f}*")
+    lineas.append("")
+    lineas.append("Puede pasar a retirar su vehículo cuando lo desee.")
+    lineas.append("")
+    lineas.append("Gracias por su confianza.")
+    mensaje = "\n".join(lineas)
+    telefono = (orden.cliente.telefono if orden.cliente else '') or ''
+    numero_wa = _normalizar_telefono_wa(telefono)
+    if not numero_wa:
+        return None
+    return f"https://wa.me/{numero_wa}?text={quote(mensaje, safe='', encoding='utf-8')}"
+
+
+@login_required
+def orden_whatsapp(request, orden_pk):
+    """Página para abrir WhatsApp Web con mensaje listo (orden finalizada, sin API)."""
+    orden = Orden.objects.select_related('cliente', 'vehiculo', 'estado').get(pk=orden_pk)
+    detalles = DetalleOrden.objects.filter(orden=orden)
+
+    # Armar resumen del mensaje (solo texto ASCII para evitar problemas de codificacion en WhatsApp)
+    vehiculo_texto = ""
+    if orden.vehiculo:
+        marca_obj = getattr(orden.vehiculo, 'marca', None)
+        marca = getattr(marca_obj, 'nombre', None) if marca_obj else ''
+        modelo = getattr(orden.vehiculo, 'modelo', '') or ''
+        vehiculo_texto = f"{marca} - {modelo}".strip(' -') if (marca or modelo) else str(orden.vehiculo)
+
+    nombre_cliente = (orden.cliente.nombre_apellido if orden.cliente else '').strip() or 'cliente'
+    lineas = [
+        f"Hola {nombre_cliente}!",
+        "",
+        "*Servicio Automotriz Chulla*",
+        "",
+        "Le informamos que su vehículo está *listo para retirar*.",
+        f"Orden #{orden.pk}" + (f" - {vehiculo_texto}" if vehiculo_texto else ""),
+        "",
+        "*Resumen de la reparación:*",
+    ]
+    for d in detalles:
+        if d.producto:
+            subtotal = float(d.cantidad or 0) * float(d.pvp or 0)
+            lineas.append(f"  - {d.producto}: {d.cantidad} x ${d.pvp} = ${subtotal:.2f}")
+    total = float(orden.monto_cobrar or 0)
+    lineas.append("")
+    lineas.append(f"*Total: ${total:.2f}*")
+    lineas.append("")
+    lineas.append("Puede pasar a retirar su vehículo cuando lo desee.")
+    lineas.append("")
+    lineas.append("Gracias por su confianza.")
+
+    mensaje = "\n".join(lineas)
+    telefono = (orden.cliente.telefono if orden.cliente else '') or ''
+    numero_wa = _normalizar_telefono_wa(telefono)
+
+    if numero_wa:
+        whatsapp_url = f"https://wa.me/{numero_wa}?text={quote(mensaje, safe='', encoding='utf-8')}"
+    else:
+        whatsapp_url = None
+
+    context = {
+        'orden': orden,
+        'mensaje': mensaje,
+        'whatsapp_url': whatsapp_url,
+        'telefono': telefono,
+    }
+    return render(request, "ordenes/orden_whatsapp.html", context)
 
 
 def historial(request, pk):

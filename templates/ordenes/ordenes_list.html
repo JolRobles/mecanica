@@ -53,6 +53,14 @@ Dashboard
     </table>
 </div>
 </div>
+  {% if abrir_whatsapp_url %}
+  <script>
+    (function() {
+      var url = "{{ abrir_whatsapp_url|escapejs }}";
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    })();
+  </script>
+  {% endif %}
 {% endblock content %}
 
 {% block datatable_options %}

@@ -1,5 +1,6 @@
 {% extends 'home/base.html' %}
 {% load static %}
+{% load l10n %}
 
 {% block title %}
 {{ title }}
@@ -78,7 +79,7 @@
           <div class="col-md-2">Precio</div>
         </div>
         <div id="id_productos">
-          {% for detalle in detalles_orden %}
+          {% for item in detalles_orden %}
           <div class="row g-2 align-items-center mb-2 fila-detalle">
             <div class="col-md-2 col-4">
               <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" title="Eliminar">
@@ -86,22 +87,22 @@
               </button>
             </div>
             <div class="col-md-2 d-none">
-              <input class="form-control form-control-sm" name="pk_detalle" type="text" value="{{ detalle.pk }}">
+              <input class="form-control form-control-sm" name="pk_detalle" type="text" value="{{ item.detalle.pk }}">
             </div>
             <div class="col-md-3 col-8">
-              <input class="form-control form-control-sm" type="text" name="detalle_producto" value="{{ detalle.producto|default:'' }}" placeholder="Descripción">
+              <input class="form-control form-control-sm" type="text" name="detalle_producto" value="{{ item.detalle.producto|default:'' }}" placeholder="Descripción">
             </div>
             <div class="col-md-2 col-6">
               <select class="form-select form-select-sm" name="tipo_producto">
-                <option value="externo" {% if detalle.tipo_producto == 'externo' %}selected{% endif %}>Externo</option>
-                <option value="inventario" {% if detalle.tipo_producto == 'inventario' %}selected{% endif %}>Inventario</option>
+                <option value="externo" {% if item.detalle.tipo_producto == 'externo' %}selected{% endif %}>Externo</option>
+                <option value="inventario" {% if item.detalle.tipo_producto == 'inventario' %}selected{% endif %}>Inventario</option>
               </select>
             </div>
             <div class="col-md-2 col-6">
-              <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="cantidad_producto" placeholder="Cantidad" value="{{ detalle.cantidad }}" oninput="calcularCosto()">
+              <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="cantidad_producto" placeholder="Cantidad" value="{{ item.cantidad_display }}" oninput="calcularCosto()">
             </div>
             <div class="col-md-2 col-6">
-              <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="precio_producto" placeholder="0.00" value="{{ detalle.pvp }}" oninput="calcularCosto()">
+              <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="precio_producto" placeholder="0.00" value="{{ item.pvp_display }}" oninput="calcularCosto()">
             </div>
           </div>
           {% endfor %}
