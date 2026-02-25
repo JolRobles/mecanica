@@ -116,14 +116,15 @@ def orden_edit(request, orden_pk):
     orden_object = Orden.objects.get(pk=orden_pk)
     vehiculo_form = VehiculoForm(instance=orden_object.vehiculo)
     orden_form = OrdenEditForm(instance=orden_object)
-    productos_orden = ProductoOrden.objects.filter(orden=orden_object)
+    detalles_orden = DetalleOrden.objects.filter(orden=orden_object)
     if request.method == "POST":
         vehiculo_form = VehiculoForm(request.POST, instance=orden_object.vehiculo)
         orden_form = OrdenEditForm(request.POST, instance=orden_object)
-        pk_productos = request.POST.getlist('pk_producto')
+        pk_detalles = request.POST.getlist('pk_detalle')
         detalle_productos = request.POST.getlist('detalle_producto')
         cantidad_productos = request.POST.getlist('cantidad_producto')
         precio_productos = request.POST.getlist('precio_producto')
+        tipo_productos = request.POST.getlist('tipo_producto')
         if vehiculo_form.is_valid() and orden_form.is_valid():
             vehiculo = vehiculo_form.save()
             orden = orden_form.save()
@@ -133,43 +134,51 @@ def orden_edit(request, orden_pk):
                 usuario=usuario
             )
             estado_orden.save()
-            for producto in productos_orden:
-                if not str(producto.pk) in pk_productos:
-                    producto.delete()
-
-            for i in range(len(pk_productos)):
-                if ProductoOrden.objects.filter(producto__pk=int(pk_productos[i]), orden=orden).exists():
-                    ProductoOrden.objects.filter(producto__pk=int(pk_productos[i])).update(
-                        detalle=detalle_productos[i],
-                        cantidad=float(cantidad_productos[i]),
-                        pvp=float(precio_productos[i]),
-                    )
-                else:
-                    product = Producto.objects.get(pk=int(pk_productos[i]))
-                    producto_orden = ProductoOrden.objects.create(
-                        producto=product,
-                        detalle=detalle_productos[i],
-                        orden=orden,
-                        cantidad=float(cantidad_productos[i]),
-                        pvp=float(precio_productos[i]),
-                    )
-                    producto_orden.save()
+            # Eliminar detalles que ya no vienen en el formulario
+            for detalle in detalles_orden:
+                if str(detalle.pk) not in pk_detalles:
+                    detalle.delete()
+            # Crear o actualizar detalles (texto libre, sin inventario)
+            for i in range(len(detalle_productos)):
+                producto_texto = (detalle_productos[i] or '').strip()
+                cantidad = float(cantidad_productos[i]) if i < len(cantidad_productos) else 1
+                pvp = float(precio_productos[i]) if i < len(precio_productos) else 0
+                tipo = (tipo_productos[i] if i < len(tipo_productos) else 'externo') or 'externo'
+                if tipo not in ('inventario', 'externo'):
+                    tipo = 'externo'
+                pk_val = pk_detalles[i].strip() if i < len(pk_detalles) else ''
+                if pk_val and pk_val.isdigit():
+                    detalle_obj = DetalleOrden.objects.filter(pk=int(pk_val), orden=orden).first()
+                    if detalle_obj:
+                        detalle_obj.producto = producto_texto
+                        detalle_obj.cantidad = cantidad
+                        detalle_obj.pvp = pvp
+                        detalle_obj.tipo_producto = tipo
+                        detalle_obj.save()
+                        continue
+                DetalleOrden.objects.create(
+                    orden=orden,
+                    producto=producto_texto,
+                    cantidad=cantidad,
+                    pvp=pvp,
+                    tipo_producto=tipo,
+                )
             return redirect('ordenes:orden_list')
         else:
             print(vehiculo_form.errors)
             print(orden_form.errors)
             context = {
-                'title':"Editar Orden",
-                'vehiculo_form':vehiculo_form,
-                'orden_form':orden_form,
-                'productos_orden':productos_orden,
+                'title': "Editar Orden",
+                'vehiculo_form': vehiculo_form,
+                'orden_form': orden_form,
+                'detalles_orden': detalles_orden,
             }
             return render(request, "ordenes/orden_edit.html", context)
     context = {
-        'title':"Editar Orden",
-        'vehiculo_form':vehiculo_form,
-        'orden_form':orden_form,
-        'productos_orden':productos_orden,
+        'title': "Editar Orden",
+        'vehiculo_form': vehiculo_form,
+        'orden_form': orden_form,
+        'detalles_orden': detalles_orden,
     }
     return render(request, "ordenes/orden_edit.html", context)
 

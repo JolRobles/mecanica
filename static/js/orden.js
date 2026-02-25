@@ -85,46 +85,51 @@ function getProductPk(pk_producto) {
   );
   }
 
-function agregarProducto() {
-  $div = document.getElementById("id_productos")
-  $row = document.createElement('div')
-  $row.className="row"
-  $row.style="padding: 5px;"
-  $row.innerHTML = `<div class="row"">
-  <div class="col-md-2">
-    <a class="btn btn-danger" onclick="eliminarProducto(this)">Eliminar</a>
-  </div>
-  <div class="col-md-2" style="display: none;">
-    <input id="id_producto_pk" class="form-control" name="pk_producto"  type="text" placeholder="pk_producto">
-  </div>
-  <div class="col-md-4">
-    <input id="id_producto" class="form-control"  type="text" name="detalle_producto"  list="producto_by_nombre" placeholder="Producto" onkeyup="buscarProducto(this)">
-    <datalist id="producto_by_nombre"></datalist>
-  </div>
-  <div class="col-md-3">
-    <input id="id_cantidad" class="form-control" type="number" name="cantidad_producto" placeholder="Cantidad">
-  </div>
-  <div class="col-md-3">
-    <input id="id_precio" class="form-control" type="number" name="precio_producto"  placeholder="Precio" onKeyUp=calcularCosto()>
-  </div>
-</div>`
-$div.appendChild($row)
+function agregarDetalle() {
+  var div = document.getElementById("id_productos");
+  if (!div) return;
+  var row = document.createElement('div');
+  row.className = "row g-2 align-items-center mb-2 fila-detalle";
+  row.innerHTML =
+    '<div class="col-md-2 col-4"><button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" title="Eliminar"><i class="fas fa-trash-alt me-1"></i> Quitar</button></div>' +
+    '<div class="col-md-2 d-none"><input class="form-control form-control-sm" name="pk_detalle" type="text" value=""></div>' +
+    '<div class="col-md-3 col-8"><input class="form-control form-control-sm" type="text" name="detalle_producto" placeholder="Descripción"></div>' +
+    '<div class="col-md-2 col-6"><select class="form-select form-select-sm" name="tipo_producto"><option value="externo">Externo</option><option value="inventario">Inventario</option></select></div>' +
+    '<div class="col-md-2 col-6"><input class="form-control form-control-sm input-cantidad" type="number" step="0.01" min="0" name="cantidad_producto" value="1" placeholder="Cantidad" oninput="calcularCosto()"></div>' +
+    '<div class="col-md-2 col-6"><input class="form-control form-control-sm input-precio" type="number" step="0.01" min="0" name="precio_producto" value="0.00" placeholder="0.00" oninput="calcularCosto()"></div>';
+  var totalRow = div.querySelector('.fila-total-detalles');
+  if (totalRow) div.insertBefore(row, totalRow);
+  else div.appendChild(row);
+  if (typeof calcularCosto === 'function') calcularCosto();
+}
 
+function agregarProducto() {
+  agregarDetalle();
 }
 
 function eliminarProducto(element) {
-  $element = element
-  console.log($element);
-  $element.parentElement.parentElement.remove()
-  calcularCosto()
+  var fila = element.closest && element.closest('.fila-detalle');
+  if (fila) fila.remove();
+  else if (element.parentElement && element.parentElement.parentElement) element.parentElement.parentElement.remove();
+  if (typeof calcularCosto === 'function') calcularCosto();
 }
 
 function calcularCosto() {
- $monto_cobrar = document.getElementById('id_monto_cobrar') 
- $precios_productos = document.getElementsByName('precio_producto')
- total = 0
- for (let i = 0; i < $precios_productos.length; i++) {
-  total = parseFloat($precios_productos[i].value) + total
- }
-  $monto_cobrar.value = total
+  var montoCobrar = document.getElementById('id_monto_cobrar');
+  var totalDetallesEl = document.getElementById('valor-total-detalles');
+  var filas = document.querySelectorAll('.fila-detalle:not(.fila-total-detalles)');
+  var total = 0;
+
+  filas.forEach(function(fila) {
+    var cantInput = fila.querySelector('input[name="cantidad_producto"]');
+    var precInput = fila.querySelector('input[name="precio_producto"]');
+    if (!cantInput || !precInput) return;
+    var cant = parseFloat(cantInput.value) || 0;
+    var prec = parseFloat(precInput.value) || 0;
+    total += cant * prec;
+  });
+
+  total = Math.round(total * 100) / 100;
+  if (montoCobrar) montoCobrar.value = total.toFixed(2);
+  if (totalDetallesEl) totalDetallesEl.textContent = total.toLocaleString('es-EC', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }

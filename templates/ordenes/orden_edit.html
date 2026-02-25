@@ -2,98 +2,145 @@
 {% load static %}
 
 {% block title %}
-Editar Orden
+{{ title }}
 {% endblock title %}
 
 {% load bootstrap5 %}
-<!--<body id="page-top"> -->
 
-<!-- Begin Page Content -->
 {% block content %}
-  {{ block.super }}
-  <div class="row text-center col-md-12" style="display: flex; justify-content: center; align-items: center;">
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <h1><strong>{{title}}</strong></h1>
-      <div class="panel-body text-center">
-        <div class="row text-center" style="display: flex; justify-content: center; align-items: center;">
-          <h5>Datos Vehículo</h5>
-          <div class="col-md-3">
-            {% bootstrap_field vehiculo_form.tipo layout='horizontal' %}
+{{ block.super }}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800"><strong>{{ title }}</strong></h1>
+    <a href="{% url 'ordenes:orden_list' %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-1"></i> Volver al listado
+    </a>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+    {% csrf_token %}
+
+    <!-- Datos del vehículo -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header py-2 bg-success text-white">
+        <h5 class="card-title mb-0"><i class="fas fa-car me-2"></i>Datos del vehículo</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3 col-6">
+            {% bootstrap_field vehiculo_form.tipo layout='vertical' %}
           </div>
-          <div class="col-md-3">
-            {% bootstrap_field vehiculo_form.marca layout='horizontal' %}
+          <div class="col-md-3 col-6">
+            {% bootstrap_field vehiculo_form.marca layout='vertical' %}
           </div>
-          <div class="col-md-3">
-            {% bootstrap_field vehiculo_form.modelo layout='horizontal' %}
+          <div class="col-md-3 col-6">
+            {% bootstrap_field vehiculo_form.modelo layout='vertical' %}
           </div>
-          <div class="col-md-3">
-            {% bootstrap_field vehiculo_form.placa layout='horizontal' %}
+          <div class="col-md-3 col-6">
+            {% bootstrap_field vehiculo_form.placa layout='vertical' %}
           </div>
-          <div class="col-md-3">
-            {% bootstrap_field vehiculo_form.password layout='horizontal' %}
+          <div class="col-md-3 col-6">
+            {% bootstrap_field vehiculo_form.password layout='vertical' %}
           </div>
-          <div class="col-md-3">
-            {% bootstrap_field orden_form.mecanico layout='horizontal' %}
+          <div class="col-md-3 col-6">
+            {% bootstrap_field orden_form.mecanico layout='vertical' %}
           </div>
-          <div class="col-md-3">
-            {% bootstrap_field orden_form.estado layout='horizontal' %}
+          <div class="col-md-3 col-6">
+            {% bootstrap_field orden_form.estado layout='vertical' %}
           </div>
-          <div class="col-md-3">
-            {% bootstrap_field orden_form.monto_cobrar layout='horizontal' %}
+          <div class="col-md-3 col-6">
+            {% bootstrap_field orden_form.monto_cobrar layout='vertical' %}
           </div>
-          <div class="col-md-6">
+          <div class="col-12 col-md-6">
             {% bootstrap_field orden_form.situacion layout='vertical' %}
           </div>
-          <div class="col-md-6">
+          <div class="col-12 col-md-6">
             {% bootstrap_field orden_form.observacion layout='vertical' %}
-          </div>
-          <div class="row col-md-3" style="padding: 10px;">
-            <a class="btn btn-primary" onclick="agregarProducto()"> + Agregar productos</a>
-          </div>
-          <br>
-          <div id="id_productos" class="content">
-            {% for producto in productos_orden %}
-            <div class="row" style="padding: 5px;">
-              <div class="col-md-2">
-                <a class="btn btn-danger" onclick="eliminarProducto(this)">Eliminar</a>
-              </div>
-              <div class="col-md-2" style="display: none;">
-                <input id="id_producto_pk" class="form-control" name="pk_producto"  type="text" placeholder="pk_producto" value="{{producto.producto.pk}}">
-              </div>
-              <div class="col-md-4">
-                <input id="id_producto" autocomplete="off" class="form-control"  type="text" name="detalle_producto" value="{{producto.detalle}}" list="producto_by_nombre" placeholder="Nombre del producto" onkeyup="buscarProducto(this)">
-                <datalist id="producto_by_nombre"></datalist>
-              </div>
-              <div class="col-md-3">
-                <input id="id_cantidad" autocomplete="off" class="form-control" type="number" name="cantidad_producto" placeholder="Cantidad" value="{{producto.cantidad}}">
-              </div>
-              <div class="col-md-3">
-                <input id="id_precio" autocomplete="off" class="form-control" type="number" name="precio_producto"  placeholder="Precio" onKeyUp=calcularCosto() value="{{producto.pvp}}">
-              </div>
-            </div>
-            {% endfor %}
           </div>
         </div>
       </div>
-      <div class="panel-footer text-right" style="padding-bottom: 20px; padding-top: 20px;">
-        <a type="button" href="{% url 'ordenes:orden_list' %}" class="btn btn-primary" type="submit">Volver</a>
-        <button type="submit" class="btn btn-success" id="btn-guardar-usuario">
-            Guardar
+    </div>
+
+    <!-- Detalle de productos / servicios -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header py-2 d-flex justify-content-between align-items-center bg-primary text-white">
+        <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Detalle de productos / servicios</h5>
+        <button type="button" class="btn btn-sm btn-light" onclick="agregarDetalle()">
+          <i class="fas fa-plus me-1"></i> Agregar detalle
         </button>
       </div>
-    </form>
+      <div class="card-body">
+        <div class="row g-2 mb-2 text-muted small d-none d-md-flex">
+          <div class="col-md-2">Acción</div>
+          <div class="col-md-3">Descripción</div>
+          <div class="col-md-2">Tipo</div>
+          <div class="col-md-2">Cantidad</div>
+          <div class="col-md-2">Precio</div>
+        </div>
+        <div id="id_productos">
+          {% for detalle in detalles_orden %}
+          <div class="row g-2 align-items-center mb-2 fila-detalle">
+            <div class="col-md-2 col-4">
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarProducto(this)" title="Eliminar">
+                <i class="fas fa-trash-alt me-1"></i> Quitar
+              </button>
+            </div>
+            <div class="col-md-2 d-none">
+              <input class="form-control form-control-sm" name="pk_detalle" type="text" value="{{ detalle.pk }}">
+            </div>
+            <div class="col-md-3 col-8">
+              <input class="form-control form-control-sm" type="text" name="detalle_producto" value="{{ detalle.producto|default:'' }}" placeholder="Descripción">
+            </div>
+            <div class="col-md-2 col-6">
+              <select class="form-select form-select-sm" name="tipo_producto">
+                <option value="externo" {% if detalle.tipo_producto == 'externo' %}selected{% endif %}>Externo</option>
+                <option value="inventario" {% if detalle.tipo_producto == 'inventario' %}selected{% endif %}>Inventario</option>
+              </select>
+            </div>
+            <div class="col-md-2 col-6">
+              <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="cantidad_producto" placeholder="Cantidad" value="{{ detalle.cantidad }}" oninput="calcularCosto()">
+            </div>
+            <div class="col-md-2 col-6">
+              <input class="form-control form-control-sm" type="number" step="0.01" min="0" name="precio_producto" placeholder="0.00" value="{{ detalle.pvp }}" oninput="calcularCosto()">
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="row g-2 align-items-center mt-3 pt-3 border-top fila-total-detalles" id="fila-total-detalles">
+          <div class="col-md-2 col-4"></div>
+          <div class="col-md-2 d-none"></div>
+          <div class="col-md-3 col-8 text-end fw-bold">Total detalles:</div>
+          <div class="col-md-2 col-6"></div>
+          <div class="col-md-2 col-6"></div>
+          <div class="col-md-2 col-6 fw-bold text-success" id="valor-total-detalles">0.00</div>
+        </div>
+        <p class="text-muted small mb-0 mt-2"><i class="fas fa-info-circle me-1"></i>Cantidad por defecto 1, precio 0.00. El costo total se actualiza al cambiar cantidad o precio.</p>
+      </div>
+      </div>
+    </div>
+  </div>   
+
+    <!-- Acciones -->
+    <div class="panel-footer text-center">
+      <a href="{% url 'ordenes:orden_list' %}" class="btn btn-primary">Cancelar</a>
+      <button type="submit" class="btn btn-success" id="btn-guardar-usuario">
+        <i class="fas fa-save me-1"></i> Guardar cambios
+      </button>
+    </div>
+    <br>
+  </form>
 </div>
 
-
 <script type="text/javascript">
-  const url = "{{ request.scheme }}:{{ request.META.HTTP_HOST }}";
+  const url = "{{ request.scheme }}://{{ request.META.HTTP_HOST }}";
 </script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js" type="text/javascript"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
 <script type="text/javascript" src="{% static 'js/orden.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/usuario.js' %}"></script>
-
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof calcularCosto === 'function') calcularCosto();
+  });
+</script>
 {% endblock content %}

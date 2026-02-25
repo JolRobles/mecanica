@@ -6,52 +6,99 @@ Dashboard
 {% endblock title %}
 
 {% load bootstrap5 %}
-<!--<body id="page-top"> -->
 
-<!-- Begin Page Content -->
 {% block content %}
-  {{ block.super }}
-<div class="row text-center"  style="display: flex; justify-content: center; align-items: center;">
-    <div class="col-md-4 col-xs-4 menu1" >
-        <a href="{% url 'ordenes:orden_form' %}" style="color:#fff; text-decoration: none;">
-        <div class="menu" style=" background-color: #28B779;">
-            <i class="fas fa-plus-circle" style="font-size: 100px; padding-top: 10px;"></i>
-            <h2>Nueva Reparación</h2>
+{{ block.super }}
+<div class="container py-4">
+  <div class="text-center mb-4">
+    <h1 class="h3 mb-1 text-gray-800">Panel de control</h1>
+    <p class="text-muted small mb-0">Seleccione una opción para continuar</p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    <div class="col-12 col-sm-6 col-md-4">
+      <a href="{% url 'ordenes:orden_form' %}" class="text-decoration-none text-white">
+        <div class="card border-0 shadow-sm h-100 menu-card menu-card--verde">
+          <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
+            <i class="fas fa-car fa-4x mb-3 opacity-90"></i>
+            <h2 class="h5 card-title mb-0">Nueva reparación</h2>
+            <span class="small mt-1 opacity-90">Crear orden de trabajo</span>
+          </div>
         </div>
-        </a>
+      </a>
     </div>
-    <div class="col-md-4 col-xs-4 menu1" >
-        <a href="{% url 'ordenes:orden_list' %}" style="color:#fff; text-decoration: none;">
-        <div class="menu" style=" background-color: #27A9E3;">
-            <i class="fas fa-list-alt" style="font-size: 100px;"></i>
-            <h2>Historial de reparación</h2>
+    <div class="col-12 col-sm-6 col-md-4">
+      <a href="{% url 'ordenes:orden_list' %}" class="text-decoration-none text-white">
+        <div class="card border-0 shadow-sm h-100 menu-card menu-card--azul">
+          <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
+            <i class="fas fa-list-alt fa-4x mb-3 opacity-90"></i>
+            <h2 class="h5 card-title mb-0">Historial de reparación</h2>
+            <span class="small mt-1 opacity-90">Ver y gestionar órdenes</span>
+          </div>
         </div>
-        </a>
+      </a>
     </div>
-    <div class="col-md-4 col-xs-4 menu1" >
-        <a href="{% url 'usuarios:clientes_list' %}" style="color:#fff; text-decoration: none;">
-        <div class="menu" style=" background-color: #DA542E;">
-            <i class="fas fa-users" style="font-size: 100px;"></i>
-            <h2>Clientes</h2>
+    <div class="col-12 col-sm-6 col-md-4">
+      <a href="{% url 'usuarios:clientes_list' %}" class="text-decoration-none text-white">
+        <div class="card border-0 shadow-sm h-100 menu-card menu-card--naranja">
+          <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
+            <i class="fas fa-users fa-4x mb-3 opacity-90"></i>
+            <h2 class="h5 card-title mb-0">Clientes</h2>
+            <span class="small mt-1 opacity-90">Lista de clientes</span>
+          </div>
         </div>
-        </a>
+      </a>
     </div>
-    <div class="col-md-4 col-xs-4 menu1" >
-        <a href="{% url 'productos:productos_list' %}" style="color:#fff; text-decoration: none;">
-        <div class="menu" style=" background-color: #FFB848; ">
-            <i class="fas fa-boxes" style="font-size: 100px; padding-top: 10px ;"></i>
-            <h2>Repuestos</h2>
+    <div class="col-12 col-sm-6 col-md-4">
+      <a href="{% url 'vehiculos:marcas_vehiculo_list' %}" class="text-decoration-none text-white">
+        <div class="card border-0 shadow-sm h-100 menu-card menu-card--amarillo">
+          <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
+            <i class="fas fa-plus-circle fa-4x mb-3 opacity-90"></i>
+            <h2 class="h5 card-title mb-0">Marcas Vehículos</h2>
+            <span class="small mt-1 opacity-90">Marcas de vehículos</span>
+          </div>
         </div>
-    </a>
+      </a>
     </div>
-    
-    <div class="col-md-4 col-xs-4 menu1">
-        <a href="{% url 'home:configuracion' %}" style="color:#fff; text-decoration: none;">
-        <div class="menu" style=" background-color: #198c90;" >
-            <i class="fas fa-cog" style="font-size: 100px; padding-top: 10px;"></i>
-            <h2>Configuración</h2>
+    <div class="col-12 col-sm-6 col-md-4">
+      <a href="{% url 'home:configuracion' %}" class="text-decoration-none text-white">
+        <div class="card border-0 shadow-sm h-100 menu-card menu-card--teal">
+          <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
+            <i class="fas fa-cog fa-4x mb-3 opacity-90"></i>
+            <h2 class="h5 card-title mb-0">Configuración</h2>
+            <span class="small mt-1 opacity-90">Ajustes del sistema</span>
+          </div>
         </div>
-        </a>
+      </a>
     </div>
+    <div class="col-12 col-sm-6 col-md-4">
+      <a href="{% url 'usuarios:usuarios_list' %}" class="text-decoration-none text-white">
+        <div class="card border-0 shadow-sm h-100 menu-card menu-card--purpura">
+          <div class="card-body text-center d-flex flex-column justify-content-center align-items-center py-4">
+            <i class="fas fa-user-cog fa-4x mb-3 opacity-90"></i>
+            <h2 class="h5 card-title mb-0">Colaboradores</h2>
+            <span class="small mt-1 opacity-90">Ingresar colaboradores</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
 </div>
+
+<style>
+.menu-card {
+  border-radius: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15) !important;
+}
+.menu-card--verde    { background: linear-gradient(135deg, #28B779 0%, #219e6a 100%); }
+.menu-card--azul     { background: linear-gradient(135deg, #27A9E3 0%, #1e8fc7 100%); }
+.menu-card--naranja  { background: linear-gradient(135deg, #DA542E 0%, #c44a29 100%); }
+.menu-card--amarillo { background: linear-gradient(135deg, #FFB848 0%, #e6a63e 100%); }
+.menu-card--teal     { background: linear-gradient(135deg, #198c90 0%, #157277 100%); }
+.menu-card--purpura  { background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); }
+</style>
 {% endblock content %}

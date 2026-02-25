@@ -20,6 +20,7 @@ class Orden(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, null=True, blank=True)
     situacion = models.TextField(blank=True, null=True)
     observacion = models.TextField(blank=True, null=True)
+    kilometraje = models.IntegerField(blank=True, null=True)
     mecanico = models.ForeignKey(Usuario, blank=True, null = True,  on_delete=models.CASCADE)
     fecha_ingreso = models.DateTimeField(auto_now=True)
     estado = models.ForeignKey(Estado, on_delete=models.CASCADE, null=True, blank=True, default=1)
@@ -39,12 +40,16 @@ class EstadOrden(models.Model):
         verbose_name = 'estadOrden'
         verbose_name_plural = 'estadOrdenes'
 
-class ProductoOrden(models.Model):
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, null=True, blank=True)
-    detalle = models.CharField(max_length=300, null=True, blank=True)
+class DetalleOrden(models.Model):
+    TIPO_PRODUCTO_CHOICES = [
+        ('externo', 'Externo'),
+        ('inventario', 'Inventario'),
+    ]
+    producto = models.CharField(max_length=300, null=True, blank=True)
     orden = models.ForeignKey(Orden, on_delete=models.CASCADE, null=True, blank=True)
     cantidad = models.DecimalField(max_digits=9, decimal_places=2, default=1)
+    tipo_producto = models.CharField(max_length=20, choices=TIPO_PRODUCTO_CHOICES, null=True, blank=True)
     pvp = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     class Meta:
-        verbose_name = 'ProductOrden'
-        verbose_name_plural = 'ProductosOrden'
+        verbose_name = 'DetalleOrden'
+        verbose_name_plural = 'DetallesOrden'

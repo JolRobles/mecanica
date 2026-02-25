@@ -19,7 +19,7 @@ Dashboard
     <table id="tabla-ordenes" class="table table-striped table-responsive" style="width:100%">
         <thead>
             <tr>
-                <th id="sorting sorting_desc">pk</th>
+                <th id="sorting sorting_asc">pk</th>
                 <th>Nombres y Apellidos</th>
                 <th>Cédula</th>
                 <th>Marca</th>
@@ -58,7 +58,7 @@ Dashboard
 {% block datatable_options %}
 if ($('#tabla-ordenes').length) {
   $('#tabla-ordenes').DataTable({
-    order: [[7, 'desc']],
+    order: [[0, 'desc']],
     language: {
       search: 'Buscar:',
       lengthMenu: 'Mostrar _MENU_ registros',

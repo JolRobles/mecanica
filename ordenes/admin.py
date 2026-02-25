@@ -16,6 +16,6 @@ class EstadoAdmin(admin.ModelAdmin):
 class EstadOrdenAdmin(admin.ModelAdmin):
     list_display=['id','estado','orden']
 
-@admin.register(ProductoOrden)
-class ProductoOrdenAdmin(admin.ModelAdmin):
-    list_display=['id', 'producto', 'orden']
+@admin.register(DetalleOrden)
+class DetalleOrdenAdmin(admin.ModelAdmin):
+    list_display=['id', 'producto', 'orden', 'cantidad', 'tipo_producto', 'pvp']
