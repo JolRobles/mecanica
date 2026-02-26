@@ -49,6 +49,11 @@ def orden_form(request):
         mecanico = request.POST.getlist('mecanico')
         situacion = request.POST.getlist('situacion')
         observacion = request.POST.getlist('observacion')
+        kilometraje = request.POST.getlist('kilometraje')
+        detalle_productos = request.POST.getlist('detalle_producto')
+        cantidad_productos = request.POST.getlist('cantidad_producto')
+        precio_productos = request.POST.getlist('precio_producto')
+        tipo_productos = request.POST.getlist('tipo_producto')
         if cliente_form.is_valid() and vehiculo_form.is_valid() and orden_form.is_valid():
             cedula = cliente_form.cleaned_data.get('cedula')
             if cedula and Cliente.objects.filter(cedula=cedula).exists():
@@ -70,6 +75,7 @@ def orden_form(request):
                         cliente = form_actualizado.save()
             else:
                 cliente = cliente_form.save()
+            ordenes_creadas = []
             for i in range(len(tipo)):
                 vehiculo = Vehiculo.objects.create(
                     tipo_id = tipo[i],
@@ -80,21 +86,50 @@ def orden_form(request):
                     password = password[i],
                 )
                 vehiculo.save()
+                km = None
+                if kilometraje and i < len(kilometraje) and kilometraje[i].strip():
+                    try:
+                        km = int(kilometraje[i])
+                    except (ValueError, TypeError):
+                        pass
                 orden = Orden.objects.create(
                     cliente = cliente,
                     vehiculo = vehiculo,
                     empresa = empresa,
-                    situacion = situacion[i],
-                    observacion = observacion[i],
-                    mecanico_id = mecanico[i],
+                    situacion = situacion[i] if i < len(situacion) else '',
+                    observacion = observacion[i] if i < len(observacion) else '',
+                    mecanico_id = mecanico[i] if i < len(mecanico) else None,
+                    kilometraje = km,
                 )
                 orden.save()
+                ordenes_creadas.append(orden)
                 estado_orden = EstadOrden.objects.create(
                     estado=orden.estado,
                     orden=orden,
                     usuario=usuario
                 )
                 estado_orden.save()
+            # Crear detalles para la primera orden (solo si hay al menos uno con descripción)
+            if ordenes_creadas and detalle_productos:
+                primera_orden = ordenes_creadas[0]
+                total_detalles = 0
+                for j in range(len(detalle_productos)):
+                    producto_texto = (detalle_productos[j] or '').strip()
+                    cantidad = float(cantidad_productos[j]) if j < len(cantidad_productos) else 1
+                    pvp = float(precio_productos[j]) if j < len(precio_productos) else 0
+                    tipo_prod = (tipo_productos[j] if j < len(tipo_productos) else 'externo') or 'externo'
+                    if tipo_prod not in ('inventario', 'externo'):
+                        tipo_prod = 'externo'
+                    DetalleOrden.objects.create(
+                        orden=primera_orden,
+                        producto=producto_texto or '-',
+                        cantidad=cantidad,
+                        pvp=pvp,
+                        tipo_producto=tipo_prod,
+                    )
+                    total_detalles += cantidad * pvp
+                primera_orden.monto_cobrar = round(total_detalles, 2)
+                primera_orden.save()
             return redirect('ordenes:orden_list')
         else:
             print(cliente_form.errors)

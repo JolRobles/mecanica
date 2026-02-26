@@ -28,14 +28,15 @@
       </div>
       <div class="card-body">
         <div class="row g-3">
-          <div class="col-md-3 col-6">
-            {% bootstrap_field vehiculo_form.tipo layout='vertical' %}
-          </div>
+          
           <div class="col-md-3 col-6">
             {% bootstrap_field vehiculo_form.marca layout='vertical' %}
           </div>
           <div class="col-md-3 col-6">
             {% bootstrap_field vehiculo_form.modelo layout='vertical' %}
+          </div>
+          <div class="col-md-3 col-6">
+            {% bootstrap_field orden_form.kilometraje layout='vertical' %}
           </div>
           <div class="col-md-3 col-6">
             {% bootstrap_field vehiculo_form.placa layout='vertical' %}

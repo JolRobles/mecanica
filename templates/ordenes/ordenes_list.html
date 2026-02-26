@@ -57,7 +57,31 @@ Dashboard
   <script>
     (function() {
       var url = "{{ abrir_whatsapp_url|escapejs }}";
-      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+      if (!url) return;
+      // Intentar abrir WhatsApp automáticamente en una nueva pestaña
+      var win = window.open(url, '_blank', 'noopener,noreferrer');
+      // Si el navegador bloquea el popup, mostrar un botón para que el usuario lo abra manualmente
+      if (!win) {
+        // Insertar el aviso justo encima de la tabla de órdenes
+        var tabla = document.getElementById('tabla-ordenes');
+        var container = tabla ? tabla.closest('.container') || tabla.parentNode : document.body;
+        var aviso = document.createElement('div');
+        aviso.className = 'alert alert-success my-2';
+        aviso.innerText = 'Tu navegador bloqueó la ventana de WhatsApp. Pulsa el botón para abrir WhatsApp Web.';
+        var boton = document.createElement('a');
+        boton.href = url;
+        boton.target = '_blank';
+        boton.rel = 'noopener noreferrer';
+        boton.className = 'btn btn-success ms-2';
+        boton.innerText = 'Abrir WhatsApp Web';
+        aviso.appendChild(boton);
+        if (tabla && tabla.parentNode) {
+          // Colocar el aviso antes del contenedor de la tabla
+          tabla.parentNode.parentNode.insertBefore(aviso, tabla.parentNode);
+        } else {
+          container.insertBefore(aviso, container.firstChild);
+        }
+      }
     })();
   </script>
   {% endif %}
